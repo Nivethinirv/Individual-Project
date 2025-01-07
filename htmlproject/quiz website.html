@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://th.bing.com/th/id/R.ad6333950962065a545fc62c8b476922?rik=yEkPoy1LpWDPmA&riu=http%3a%2f%2fwallpapercave.com%2fwp%2fQz6yffg.jpg&ehk=OL1598DxWq0CM0vLppcrcE5TZjxYfrozT5nkSouB7vw%3d&risl=&pid=ImgRaw&r=0 '); 
+			background-size: cover; 
+            background-position: center;
+            background-attachment: fixed; 
+            margin: 100;
+            padding: 100;
+            color: white; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; 
+        }
+
+        .quiz-container {
+         background-color: rgba(5, 4, 4, 0.5); 
+         padding: 20px;
+         border-radius: 8px;
+         box-shadow: 0 4px 12px rgba(6, 93, 244, 0.5);
+         width: 350px;
+         text-align: center;
+}
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            
+        }
+
+        .question {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin: 10px 0;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #start-btn, #next {
+            background-color: #008CBA;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #start-btn:hover, #next:hover {
+            background-color: #007bb5;
+        }
+
+        #quiz-result {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .result {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <h1>Welcome to GoToQuiz</h1>
+
+        <!-- Start Button -->
+        <button id="start-btn" onclick="startQuiz()">Start Quiz</button>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="hidden">
+            <p class="question" id="question"></p>
+            <ul class="options" id="options"></ul>
+            <button id="next" class="hidden" onclick="nextQuestion()">Next Question</button>
+        </div>
+
+        <!-- Result Container -->
+        <div id="result-container" class="hidden">
+            <p id="quiz-result"></p>
+            <button onclick="restartQuiz()">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        // Define quiz questions and answers
+        const questions = [
+            { question: "What does HTML stands for?", options: ["Hyper Text Markup Language", "Hyper Tool Markup Language", "Hyperlinks Markup Language", "Home Text Markup Language"], correctAnswer: "Hyper Text Markup Language" },
+            { question: "Choose the correct element HTML element to define important text?", options: ["<Strong>", "<i>", "<important>", "<b>"], correctAnswer: "<strong>" },
+            { question: "What is the correct HTML element for inserting a line break?", options: ["<lb>", "<break>", "<br>", "<bl>"], correctAnswer: "<br>" },
+            { question: "Choose the correct HTML element for the largest heading:", options: ["<h6>", "<heading>", "<head>", "<h1>"], correctAnswer: "<h1>" },
+            { question: "Who is making the Web standards?", options: ["Mozilla", "Microsoft", "The world wide web consortium", "Google"], correctAnswer: "The world wide web consortium" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        // Start the quiz
+        function startQuiz() {
+            document.getElementById("start-btn").classList.add("hidden");
+            document.getElementById("quiz-container").classList.remove("hidden");
+            loadQuestion();
+        }
+
+        // Load the current question and options
+        function loadQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById("question").textContent = currentQuestion.question;
+
+            const optionsContainer = document.getElementById("options");
+            optionsContainer.innerHTML = '';
+
+            currentQuestion.options.forEach(option => {
+                const li = document.createElement('li');
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => checkAnswer(button, option);
+                li.appendChild(button);
+                optionsContainer.appendChild(li);
+            });
+
+            // Hide "Next Question" initially
+            document.getElementById("next").classList.add("hidden");
+        }
+
+        // Check if the selected answer is correct
+        function checkAnswer(button, selectedOption) {
+            const correctAnswer = questions[currentQuestionIndex].correctAnswer;
+
+            if (selectedOption === correctAnswer) {
+                button.style.backgroundColor = 'green'; // Correct answer
+                score++;
+            } else {
+                button.style.backgroundColor = 'red'; // Wrong answer
+            }
+
+            // Disable all buttons after selecting an answer
+            const buttons = document.querySelectorAll(".options button");
+            buttons.forEach(btn => btn.disabled = true);
+
+            // Show "Next Question" button
+            document.getElementById("next").classList.remove("hidden");
+        }
+
+        // Move to the next question
+        function nextQuestion() {
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // Show the result after the quiz is finished
+        function showResult() {
+            document.getElementById("quiz-container").classList.add("hidden");
+            document.getElementById("result-container").classList.remove("hidden");
+
+            const resultText = `You scored ${score} out of ${questions.length}!`;
+            document.getElementById("quiz-result").textContent = resultText;
+        }
+
+        // Restart the quiz
+        function restartQuiz() {
+            score = 0;
+            currentQuestionIndex = 0;
+            document.getElementById("result-container").classList.add("hidden");
+            document.getElementById("start-btn").classList.remove("hidden");
+        }
+    </script>
+
+</body>
+</html>
